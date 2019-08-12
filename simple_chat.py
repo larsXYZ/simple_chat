@@ -7,9 +7,6 @@ import json
 #Loading PID
 PG_ID   = int(os.getpid())
 
-#Loading username
-username = input("Username: ")
-
 #Ports
 RX_PORT = 14001
 TX_PORT = 14002
@@ -30,13 +27,16 @@ except:
     import sys
     sys.exit(1)
 
-# We launch the receive thread
+#Loading username
+username = input("Username: ")
+
+#We launch the receive thread
 def rx(s_rx):
     while True:
         data_rx, addr = s_rx.recvfrom(1024)
         msg_rx_dic = json.loads(data_rx.decode('utf-8'))
 
-        print(msg_rx_dic['username'], "->", msg_rx_dic['msg'])
+        if msg_rx_dic['username'] != username: print(msg_rx_dic['username'], "->", msg_rx_dic['msg'])
 
 rx_thread = threading.Thread(target=rx,args=(s_rx,))
 rx_thread.start()
@@ -78,15 +78,11 @@ def hb(s_hb):
                     print(user, "has left the chat..")
                     del connected_users[user]
 
-
-
-
 hb_thread = threading.Thread(target=hb,args=(s_hb,))
 hb_thread.start()
 
 #Sending and receiving
 while True:
     input()
-    msg_tx_str = input("<- ")
-    msg_tx_dic = { "username" : username , "msg" : msg_tx_str}
+    msg_tx_dic = { "username" : username , "msg" : input("<- ")}
     s_rx.sendto(bytearray(json.dumps(msg_tx_dic), encoding='utf-8'), ('192.168.1.255', RX_PORT))
