@@ -76,8 +76,8 @@ def hb(s_hb):
         except:
             #Checking if any users have timed out
             time_now = int(time.time())
-            for user in connected_users:
-                if time_now - connected_users[user] > 10:
+            for user, timestamp in list(connected_users.items()):
+                if time_now - timestamp > 10:
                     print(user, "has left the chat..")
                     del connected_users[user]
 
