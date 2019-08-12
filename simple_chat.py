@@ -16,11 +16,14 @@ HB_PORT = 14003
 try:
     s_rx = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #  Receive socket
     s_rx.bind(('', RX_PORT))
+    s_rx.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     s_tx = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Transmit socket
     s_tx.bind(('', TX_PORT))
+    s_tx.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     s_hb = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #Heartbeat socket
     s_hb.settimeout(1) #This socket will only block in for 1 second
     s_hb.bind(('', HB_PORT))
+    s_hb.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 except:
     print("Error creating sockets")
     time.sleep(5)
@@ -73,8 +76,8 @@ def hb(s_hb):
         except:
             #Checking if any users have timed out
             time_now = int(time.time())
-            for user, timestamp in connected_users:
-                if time_now - timestamp > 10:
+            for user in connected_users:
+                if time_now - connected_users[user] > 10:
                     print(user, "has left the chat..")
                     del connected_users[user]
 
